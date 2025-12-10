@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trekers-GPT🤖</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #001a00 0%, #003300 50%, #004d00 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
+            }
+            to {
+                text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+            }
+        }
+        
+        .header h1 {
+            color: #00ff00;
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #00cc00;
+            font-size: 1.2em;
+        }
+        
+        .api-config {
+            background: rgba(0, 30, 0, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid #00ff00;
+        }
+        
+        .api-config h3 {
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+        
+        .config-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .config-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            background: rgba(0, 20, 0, 0.8);
+            color: #00ff00;
+        }
+        
+        .api-keys {
+            margin-top: 15px;
+        }
+        
+        .api-key-item {
+            background: rgba(0, 40, 0, 0.6);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #009900;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .api-key-item:hover {
+            background: rgba(0, 60, 0, 0.8);
+            transform: translateX(5px);
+        }
+        
+        .api-key-name {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        .api-key-value {
+            color: #00cc00;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+        
+        .chat-container {
+            background: rgba(0, 20, 0, 0.8);
+            border-radius: 15px;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0, 30, 0, 0.6);
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, #006600, #008800);
+            color: #00ff00;
+            margin-left: 20%;
+            border: 1px solid #00cc00;
+        }
+        
+        .bot-message {
+            background: linear-gradient(135deg, #002200, #004400);
+            color: #00ff00;
+            margin-right: 20%;
+            border: 1px solid #009900;
+        }
+        
+        .input-area {
+            padding: 20px;
+            background: rgba(0, 40, 0, 0.8);
+            border-top: 2px solid #00ff00;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            background: rgba(0, 30, 0, 0.8);
+            color: #00ff00;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        #user-input:focus {
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        #send-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #00cc00, #00ff00);
+            border: none;
+            border-radius: 8px;
+            color: #001a00;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+        }
+        
+        .typing-indicator {
+            display: none;
+            color: #00ff00;
+            font-style: italic;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .typing-dots {
+            display: inline-block;
+        }
+        
+        .typing-dots span {
+            animation: typing 1.4s infinite;
+            display: inline-block;
+            opacity: 0.6;
+        }
+        
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+        }
+        
+        .status {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+        
+        .status-connected {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        
+        .status-disconnected {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+        
+        .refresh-btn {
+            background: #006600;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .refresh-btn:hover {
+            background: #008800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="pulse">Trekers-GPT🤖</h1>
+            <p>Selamat datang di Trekers. Mulai berinteraksi.</p>
+        </div>
+        
+        <div class="api-config">
+            <h3>⚙️ Konfigurasi API</h3>
+            <div class="config-input">
+                <input type="text" id="api-url" placeholder="API URL" value="https://api.deepseek.com">
+            </div>
+            <div class="config-input">
+                <input type="text" id="api-token" placeholder="API Token" value="sk-68355e4d82964ce7bc69ee44ed3278d2">
+            </div>
+            <div class="config-input">
+                <input type="text" id="api-model" placeholder="Model" value="deepseek-chat">
+            </div>
+            
+            <div class="api-keys" id="api-keys-list">
+                <h4>📋 API Keys dari api.txt:</h4>
+                <!-- API keys akan dimuat di sini -->
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="save-config" style="padding: 8px 16px; background: #00ff00; color: #001a00; border: none; border-radius: 5px; cursor: pointer;">Simpan Konfigurasi</button>
+                <button id="refresh-api" class="refresh-btn">🔄 Muat Ulang API Keys</button>
+                <button id="test-api" class="refresh-btn">🔍 Test API</button>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    Halo! Saya Trekers-GPT 🤖 siap membantu mengerjakan tugas sekolah Anda. Silakan tanyakan apa saja!
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="typing-dots">
+                    <span>●</span>
+                    <span>●</span>
+                    <span>●</span>
+                </div>
+                Trekers-GPT sedang mengetik...
+            </div>
+            
+            <div class="status status-connected" id="connection-status">
+                🔗 Menunggu koneksi...
+            </div>
+            
+            <div class="input-area">
+                <div class="input-group">
+                    <input type="text" id="user-input" placeholder="Ketik pertanyaan atau tugas sekolah Anda..." autocomplete="off">
+                    <button id="send-btn">Kirim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const connectionStatus = document.getElementById('connection-status');
+        const apiUrlInput = document.getElementById('api-url');
+        const apiTokenInput = document.getElementById('api-token');
+        const apiModelInput = document.getElementById('api-model');
+        const saveConfigBtn = document.getElementById('save-config');
+        const refreshApiBtn = document.getElementById('refresh-api');
+        const testApiBtn = document.getElementById('test-api');
+        const apiKeysList = document.getElementById('api-keys-list');
+        
+        // Konfigurasi default
+        let config = {
+            apiUrl: 'https://api.deepseek.com',
+            apiToken: 'sk-68355e4d82964ce7bc69ee44ed3278d2',
+            model: 'deepseek-chat',
+            currentKeyIndex: 0
+        };
+        
+        let apiKeys = [];
+        let conversationHistory = [
+            {
+                role: "system",
+                content: "Anda adalah asisten AI yang membantu mengerjakan tugas sekolah. Berikan jawaban yang akurat, jelas, dan edukatif. Bantu siswa memahami konsep dengan baik."
+            }
+        ];
+        
+        // Load config dari localStorage
+        function loadConfig() {
+            const savedConfig = localStorage.getItem('trekers-config');
+            if (savedConfig) {
+                const parsedConfig = JSON.parse(savedConfig);
+                config = { ...config, ...parsedConfig };
+                apiUrlInput.value = config.apiUrl;
+                apiTokenInput.value = config.apiToken;
+                apiModelInput.value = config.model;
+            }
+        }
+        
+        // Save config ke localStorage
+        function saveConfig() {
+            config.apiUrl = apiUrlInput.value;
+            config.apiToken = apiTokenInput.value;
+            config.model = apiModelInput.value;
+            localStorage.setItem('trekers-config', JSON.stringify(config));
+            showStatus('✅ Konfigurasi disimpan!', 'connected');
+        }
+        
+        // Muat API keys dari api.txt
+        async function loadApiKeys() {
+            try {
+                showStatus('📥 Memuat API keys dari api.txt...', 'connected');
+                
+                // Coba ambil dari file api.txt
+                const response = await fetch('api.txt');
+                
+                if (!response.ok) {
+                    throw new Error('File api.txt tidak ditemukan');
+                }
+                
+                const text = await response.text();
+                
+                // Parse API keys dari file
+                apiKeys = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line && line.startsWith('sk-'))
+                    .map((key, index) => ({
+                        name: `API Key ${index + 1}`,
+                        value: key,
+                        active: key === config.apiToken
+                    }));
+                
+                // Jika tidak ada keys di file, gunakan default
+                if (apiKeys.length === 0) {
+                    apiKeys = [{
+                        name: 'Default API Key',
+                        value: config.apiToken,
+                        active: true
+                    }];
+                }
+                
+                // Update UI
+                updateApiKeysList();
+                showStatus(`✅ ${apiKeys.length} API keys dimuat`, 'connected');
+                
+            } catch (error) {
+                console.error('Error loading API keys:', error);
+                apiKeys = [{
+                    name: 'Default API Key',
+                    value: config.apiToken,
+                    active: true
+                }];
+                updateApiKeysList();
+                showStatus('⚠️ Menggunakan API key default', 'disconnected');
+            }
+        }
+        
+        // Update UI daftar API keys
+        function updateApiKeysList() {
+            apiKeysList.innerHTML = '<h4>📋 API Keys:</h4>';
+            
+            apiKeys.forEach((key, index) => {
+                const keyElement = document.createElement('div');
+                keyElement.className = 'api-key-item';
+                if (key.active) {
+                    keyElement.style.borderColor = '#00ff00';
+                    keyElement.style.background = 'rgba(0, 60, 0, 0.8)';
+                }
+                
+                keyElement.innerHTML = `
+                    <div class="api-key-name">${key.name} ${key.active ? '✓' : ''}</div>
+                    <div class="api-key-value">${key.value.substring(0, 20)}...</div>
+                `;
+                
+                keyElement.addEventListener('click', () => {
+                    // Set key ini sebagai aktif
+                    apiKeys.forEach(k => k.active = false);
+                    key.active = true;
+                    
+                    // Update config
+                    config.apiToken = key.value;
+                    apiTokenInput.value = key.value;
+                    saveConfig();
+                    
+                    // Update UI
+                    updateApiKeysList();
+                    showStatus(`✅ Menggunakan ${key.name}`, 'connected');
+                });
+                
+                apiKeysList.appendChild(keyElement);
+            });
+        }
+        
+        // Rotate ke API key berikutnya
+        function rotateApiKey() {
+            if (apiKeys.length <= 1) return;
+            
+            config.currentKeyIndex = (config.currentKeyIndex + 1) % apiKeys.length;
+            const newKey = apiKeys[config.currentKeyIndex];
+            
+            // Update active state
+            apiKeys.forEach(k => k.active = false);
+            newKey.active = true;
+            
+            // Update config
+            config.apiToken = newKey.value;
+            apiTokenInput.value = newKey.value;
+            
+            // Update UI
+            updateApiKeysList();
+            showStatus(`🔄 Beralih ke ${newKey.name}`, 'connected');
+        }
+        
+        function showStatus(message, type = 'connected') {
+            connectionStatus.textContent = message;
+            connectionStatus.className = `status status-${type}`;
+        }
+        
+        async function sendToDeepSeekAPI(prompt) {
+            const endpoint = `${config.apiUrl}/chat/completions`;
+            
+            conversationHistory.push({
+                role: "user",
+                content: prompt
+            });
+            
+            let lastError = null;
+            
+            // Coba dengan API key saat ini dan rotasi jika gagal
+            for (let attempt = 0; attempt < Math.min(apiKeys.length, 3); attempt++) {
+                const currentKey = apiKeys[config.currentKeyIndex]?.value || config.apiToken;
+                
+                try {
+                    showStatus(`🔄 Mencoba dengan API key ${config.currentKeyIndex + 1}/${apiKeys.length}...`, 'connected');
+                    
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${currentKey}`
+                        },
+                        body: JSON.stringify({
+                            messages: conversationHistory,
+                            model: config.model,
+                            max_tokens: 2000,
+                            temperature: 0.7,
+                            stream: false
+                        })
+                    });
+                    
+                    console.log('Response status:', response.status);
+                    
+                    if (response.status === 429) {
+                        // Rate limit, coba key lain
+                        throw new Error('Rate limit exceeded');
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        const aiResponse = data.choices[0].message.content;
+                        conversationHistory.push({
+                            role: "assistant",
+                            content: aiResponse
+                        });
+                        
+                        showStatus(`✅ Berhasil dengan API key ${config.currentKeyIndex + 1}`, 'connected');
+                        return aiResponse;
+                    } else {
+                        throw new Error('Format respons tidak valid');
+                    }
+                    
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed:`, error);
+                    lastError = error;
+                    
+                    // Rotate ke key berikutnya
+                    rotateApiKey();
+                    
+                    // Tunggu sebentar sebelum mencoba lagi
+                    if (attempt < Math.min(apiKeys.length, 3) - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+            }
+            
+            throw new Error(lastError || 'Semua API keys gagal');
+        }
+        
+        // Test API connection
+        async function testApiConnection() {
+            try {
+                showStatus('🔍 Menguji koneksi API...', 'connected');
+                
+                const testResponse = await fetch(`${config.apiUrl}/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.apiToken}`
+                    },
+                    body: JSON.stringify({
+                        messages: [{ role: "user", content: "Test" }],
+                        model: config.model,
+                        max_tokens: 10
+                    })
+                });
+                
+                if (testResponse.ok) {
+                    showStatus('✅ API berhasil terhubung!', 'connected');
+                } else {
+                    showStatus(`❌ API error: ${testResponse.status}`, 'disconnected');
+                }
+                
+            } catch (error) {
+                showStatus(`❌ Koneksi gagal: ${error.message}`, 'disconnected');
+            }
+        }
+        
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isUser ? 'message user-message' : 'message bot-message';
+            
+            // Format pesan dengan line breaks
+            const formattedMessage = message.replace(/\n/g, '<br>');
+            messageDiv.innerHTML = formattedMessage;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        async function handleSendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            userInput.value = '';
+            addMessage(message, true);
+            
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            try {
+                const response = await sendToDeepSeekAPI(message);
+                addMessage(response, false);
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage(`❌ Error: ${error.message}. Silakan coba lagi atau periksa API keys.`, false);
+                showStatus('❌ Gagal mengirim pesan', 'disconnected');
+            } finally {
+                typingIndicator.style.display = 'none';
+            }
+        }
+        
+        // Event Listeners
+        sendBtn.addEventListener('click', handleSendMessage);
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSendMessage();
+            }
+        });
+        
+        saveConfigBtn.addEventListener('click', saveConfig);
+        refreshApiBtn.addEventListener('click', loadApiKeys);
+        testApiBtn.addEventListener('click', testApiConnection);
+        
+        // Load config dan API keys saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadConfig();
+            await loadApiKeys();
+            userInput.focus();
+            
+            // Auto-test koneksi
+            setTimeout(() => {
+                testApiConnection();
+            }, 2000);
+        });
+        
+        // Hotkeys
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === '/') {
+                e.preventDefault();
+                document.querySelector('.api-config').scrollIntoView({ behavior: 'smooth' });
+                apiUrlInput.focus();
+            }
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                handleSendMessage();
+            }
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                loadApiKeys();
+            }
+        });
+    </script>
+</body>
+</html>
